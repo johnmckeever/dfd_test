@@ -1,0 +1,145 @@
+# OSH / orchestrate script for Job S3_Count_Company compiled at 14:12:21 01 NOV 2018
+#
+# OSH / orchestrate script for Job S3_Count_Company compiled at 14:12:20 01 Nov 2018
+###############################################################
+#### STAGE: DeDupNames
+## Operator
+copy
+## General options
+[ident('DeDupNames')]
+## Inputs
+0< [ds]'/tmp/dedeup_names.ds'
+## Outputs
+0> [modify (
+CompanyName:nullable ustring[max=255]=CompanyName;
+ACN:nullable ustring[max=100]=ACN;
+Type:nullable ustring[max=100]=Type;
+Class:nullable ustring[max=100]=Class;
+SubClass:nullable ustring[max=100]=SubClass;
+Status:nullable ustring[max=100]=Status;
+DateOfReg:nullable ustring[max=50]=DateOfReg;
+PrevStateOfReg:nullable ustring[max=100]=PrevStateOfReg;
+StateRegNum:nullable ustring[max=100]=StateRegNum;
+Modified:nullable ustring[max=100]=Modified;
+Current:nullable ustring[max=100]=Current;
+ABN:nullable ustring[max=100]=ABN;
+CurrentName:nullable ustring[max=100]=CurrentName;
+CurrentNameStartDate:nullable ustring[max=50]=CurrentNameStartDate;
+keep
+CompanyName,ACN,Type,Class,
+SubClass,Status,DateOfReg,PrevStateOfReg,
+StateRegNum,Modified,Current,ABN,
+CurrentName,CurrentNameStartDate;)] 'DeDupNames:Link_33.v'
+;
+#################################################################
+#### STAGE: Transformer_43
+## Operator
+transform
+## Operator options
+-flag run
+-name 'V0S43_S3_Count_Company_Transformer'
+## General options
+[ident('Transformer_43'); jobmon_ident('Transformer_43')]
+## Inputs
+0< [] 'DeDupNames:Link_33.v'
+## Outputs
+0> [] 'Transformer_43:DSLink44.v'
+## Outputs
+1> [] 'Transformer_43:DSLink46.v'
+;
+#################################################################
+#### STAGE: AggByState
+## Operator
+group
+## Operator options
+-hash
+-key 'PrevStateOfReg'
+-countField 'RowCount'
+## General options
+[ident('AggByState'); jobmon_ident('AggByState')]
+## Inputs
+0< [] 'Transformer_43:DSLink44.v'
+## Outputs
+0> [modify (
+keep
+PrevStateOfReg,RowCount;)] 'AggByState:DSLink42.v'
+;
+#################################################################
+#### STAGE: AggCountRows
+## Operator
+group
+## Operator options
+-hash
+-key 'DUMMY'
+-countField 'RowCount'
+## General options
+[ident('AggCountRows'); jobmon_ident('AggCountRows')]
+## Inputs
+0< [] 'Transformer_43:DSLink46.v'
+## Outputs
+0> [modify (
+keep
+RowCount;)] 'AggCountRows:DSLink42.v'
+;
+#################################################################
+#### STAGE: S3_CountByState
+## Operator
+pxbridge
+## Operator options
+-Orientation stage
+-XMLProperties '<?xml version=\'1.0\' encoding=\'UTF-16\'?><Properties version=\'1.1\'><Common><Context type=\'int\'>2</Context><Variant type=\'string\'>1.0</Variant><DescriptorVersion type=\'string\'>1.0</DescriptorVersion><PartitionType type=\'int\'>-1</PartitionType><RCP type=\'int\'>0</RCP></Common><Connection><UseCredentialsFile type=\'bool\'><![CDATA[0]]></UseCredentialsFile><AccessKey type=\'string\'><![CDATA[[&"pS3_ACCESS_KEY"]]]></AccessKey><SecretKey type=\'protectedstring\'><![CDATA[{iisenc}gYeU14Jg0CdLr0kYhVizTChT9yck4yZnxkEfowyznUKw60g8xqcmqVCT4hDAmuCS]]></SecretKey><UseProxyServer collapsed=\'1\' type=\'bool\'><![CDATA[0]]></UseProxyServer></Connection><Usage><UserClassName type=\'string\'><![CDATA[com.ibm.iis.cc.s3.AmazonS3Stage]]></UserClassName><UserDefinedFunction type=\'bool\'><![CDATA[0]]></UserDefinedFunction><WriteMode type=\'int\'><![CDATA[0]]></WriteMode><BucketTarget modified=\'1\' type=\'string\'><![CDATA[[&"pS3_BKT_NAME"]]]></BucketTarget><FilenameTarget modified=\'1\' type=\'string\'><![CDATA[CompanyByState.cnt]]></FilenameTarget><CreateBucket collapsed=\'1\' type=\'bool\'><![CDATA[0]]></CreateBucket><FileExists type=\'int\'><![CDATA[0]]></FileExists><FileFormat type=\'int\'><![CDATA[0]]><DelimitedSyntax><Encoding type=\'string\'><![CDATA[]]><OutputBOM type=\'bool\'><![CDATA[0]]></OutputBOM></Encoding><Header modified=\'1\' type=\'bool\'><![CDATA[1]]><IncludeTypes type=\'bool\'><![CDATA[0]]></IncludeTypes></Header><DataFormat type=\'int\'><![CDATA[0]]></DataFormat><FieldDelimiter modified=\'1\' type=\'string\'><![CDATA[|]]></FieldDelimiter><RowDelimiter type=\'string\'><![CDATA[<NL>]]></RowDelimiter><Quotes type=\'int\'><![CDATA[0]]></Quotes><FieldFormats></FieldFormats></DelimitedSyntax></FileFormat><FileAttributes collapsed=\'1\'><Encryption type=\'int\'><![CDATA[0]]></Encryption><StorageClass type=\'int\'><![CDATA[0]]></StorageClass><LifeCycleRule collapsed=\'1\' type=\'bool\'><![CDATA[0]]></LifeCycleRule></FileAttributes><ThreadCount type=\'int\'><![CDATA[5]]></ThreadCount><Java><HeapSize type=\'int\'><![CDATA[128]]></HeapSize><ConnectorClasspath type=\'string\'><![CDATA[$(DSHOME)/../DSComponents/bin/ccjava-api.jar;$(DSHOME)/../DSComponents/bin/ccjava.jar;$(DSHOME)/../DSComponents/bin/ccs3.jar;$(DSHOME)/../DSComponents/bin/JISDocHandler.jar;$(DSHOME)]]></ConnectorClasspath><ConnectorOtherOptions type=\'string\'><![CDATA[-Dcom.ibm.tools.attach.enable=no -Dcom.ibm.is.cc.options=noisfjars ]]></ConnectorOtherOptions></Java></Usage></Properties >'
+-connector '{
+variant=\'1.0\',
+library="java:com/ibm/iis/cc/s3/connector/AmazonS3ConnectorLibrary",
+version=1.0,
+variantlist=\'V1;1.0::"java:com/ibm/iis/cc/s3/connector/AmazonS3ConnectorLibrary"\',
+versionlist=\'1.0\',
+name=AmazonS3
+}'
+-linkXMLProperties target 0  '<?xml version=\'1.0\' encoding=\'UTF-16\'?><Properties version=\'1.1\'><Common><Context type=\'int\'>2</Context><Variant type=\'string\'>1.0</Variant><Reject></Reject><DescriptorVersion type=\'string\'>1.0</DescriptorVersion><PartitionType type=\'int\'>-1</PartitionType><RCP type=\'int\'>0</RCP></Common><Usage></Usage></Properties >'
+-target 0 '{
+		DSSQLType={PrevStateOfReg=12, RowCount=8},
+		DSDerivation={PrevStateOfReg=\'DSLink44\.PrevStateOfReg\', RowCount=\'RecCount()\'},
+		DSSQLPrecision={PrevStateOfReg=100},
+		DSSchema=\'record
+			(
+			  PrevStateOfReg\:nullable ustring\[max\=100\]\;
+			  RowCount\:dfloat\;
+			)\'
+}'
+## General options
+[ident('S3_CountByState'); jobmon_ident('S3_CountByState')]
+## Inputs
+0< [] 'AggByState:DSLink42.v'
+;
+#################################################################
+#### STAGE: S3_CountRecs
+## Operator
+pxbridge
+## Operator options
+-Orientation stage
+-XMLProperties '<?xml version=\'1.0\' encoding=\'UTF-16\'?><Properties version=\'1.1\'><Common><Context type=\'int\'>2</Context><Variant type=\'string\'>1.0</Variant><DescriptorVersion type=\'string\'>1.0</DescriptorVersion><PartitionType type=\'int\'>-1</PartitionType><RCP type=\'int\'>0</RCP></Common><Connection><UseCredentialsFile type=\'bool\'><![CDATA[0]]></UseCredentialsFile><AccessKey type=\'string\'><![CDATA[[&"pS3_ACCESS_KEY"]]]></AccessKey><SecretKey type=\'protectedstring\'><![CDATA[{iisenc}gYeU14Jg0CdLr0kYhVizTChT9yck4yZnxkEfowyznUKw60g8xqcmqVCT4hDAmuCS]]></SecretKey><UseProxyServer collapsed=\'1\' type=\'bool\'><![CDATA[0]]></UseProxyServer></Connection><Usage><UserClassName type=\'string\'><![CDATA[com.ibm.iis.cc.s3.AmazonS3Stage]]></UserClassName><UserDefinedFunction type=\'bool\'><![CDATA[0]]></UserDefinedFunction><WriteMode type=\'int\'><![CDATA[0]]></WriteMode><BucketTarget modified=\'1\' type=\'string\'><![CDATA[[&"pS3_BKT_NAME"]]]></BucketTarget><FilenameTarget modified=\'1\' type=\'string\'><![CDATA[COMPANY.cnt]]></FilenameTarget><CreateBucket collapsed=\'1\' type=\'bool\'><![CDATA[0]]></CreateBucket><FileExists type=\'int\'><![CDATA[0]]></FileExists><FileFormat type=\'int\'><![CDATA[0]]><DelimitedSyntax><Encoding type=\'string\'><![CDATA[]]><OutputBOM type=\'bool\'><![CDATA[0]]></OutputBOM></Encoding><Header modified=\'1\' type=\'bool\'><![CDATA[1]]><IncludeTypes type=\'bool\'><![CDATA[0]]></IncludeTypes></Header><DataFormat type=\'int\'><![CDATA[0]]></DataFormat><FieldDelimiter modified=\'1\' type=\'string\'><![CDATA[|]]></FieldDelimiter><RowDelimiter type=\'string\'><![CDATA[<NL>]]></RowDelimiter><Quotes type=\'int\'><![CDATA[0]]></Quotes><FieldFormats></FieldFormats></DelimitedSyntax></FileFormat><FileAttributes collapsed=\'1\'><Encryption type=\'int\'><![CDATA[0]]></Encryption><StorageClass type=\'int\'><![CDATA[0]]></StorageClass><LifeCycleRule collapsed=\'1\' type=\'bool\'><![CDATA[0]]></LifeCycleRule></FileAttributes><ThreadCount type=\'int\'><![CDATA[5]]></ThreadCount><Java><HeapSize type=\'int\'><![CDATA[128]]></HeapSize><ConnectorClasspath type=\'string\'><![CDATA[$(DSHOME)/../DSComponents/bin/ccjava-api.jar;$(DSHOME)/../DSComponents/bin/ccjava.jar;$(DSHOME)/../DSComponents/bin/ccs3.jar;$(DSHOME)/../DSComponents/bin/JISDocHandler.jar;$(DSHOME)]]></ConnectorClasspath><ConnectorOtherOptions type=\'string\'><![CDATA[-Dcom.ibm.tools.attach.enable=no -Dcom.ibm.is.cc.options=noisfjars ]]></ConnectorOtherOptions></Java></Usage></Properties >'
+-connector '{
+variant=\'1.0\',
+library="java:com/ibm/iis/cc/s3/connector/AmazonS3ConnectorLibrary",
+version=1.0,
+variantlist=\'V1;1.0::"java:com/ibm/iis/cc/s3/connector/AmazonS3ConnectorLibrary"\',
+versionlist=\'1.0\',
+name=AmazonS3
+}'
+-linkXMLProperties target 0  '<?xml version=\'1.0\' encoding=\'UTF-16\'?><Properties version=\'1.1\'><Common><Context type=\'int\'>2</Context><Variant type=\'string\'>1.0</Variant><Reject></Reject><DescriptorVersion type=\'string\'>1.0</DescriptorVersion><PartitionType type=\'int\'>-1</PartitionType><RCP type=\'int\'>0</RCP></Common><Usage></Usage></Properties >'
+-target 0 '{
+		DSSQLType={RowCount=8},
+		DSDerivation={RowCount=\'RecCount()\'},
+		DSSQLPrecision={},
+		DSSchema=\'record
+			(
+			  RowCount\:dfloat\;
+			)\'
+}'
+## General options
+[ident('S3_CountRecs'); jobmon_ident('S3_CountRecs')]
+## Inputs
+0< [] 'AggCountRows:DSLink42.v'
+;
+# End of OSH code
