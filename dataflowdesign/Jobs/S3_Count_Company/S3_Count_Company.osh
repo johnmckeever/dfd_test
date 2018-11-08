@@ -1,6 +1,6 @@
-# OSH / orchestrate script for Job S3_Count_Company compiled at 14:12:21 01 NOV 2018
+# OSH / orchestrate script for Job S3_Count_Company compiled at 11:15:45 08 NOV 2018
 #
-# OSH / orchestrate script for Job S3_Count_Company compiled at 14:12:20 01 Nov 2018
+# OSH / orchestrate script for Job S3_Count_Company compiled at 11:15:43 08 Nov 2018
 ###############################################################
 #### STAGE: DeDupNames
 ## Operator
@@ -32,20 +32,20 @@ StateRegNum,Modified,Current,ABN,
 CurrentName,CurrentNameStartDate;)] 'DeDupNames:Link_33.v'
 ;
 #################################################################
-#### STAGE: Transformer_43
+#### STAGE: Tfm_CreateCol
 ## Operator
 transform
 ## Operator options
 -flag run
 -name 'V0S43_S3_Count_Company_Transformer'
 ## General options
-[ident('Transformer_43'); jobmon_ident('Transformer_43')]
+[ident('Tfm_CreateCol'); jobmon_ident('Tfm_CreateCol')]
 ## Inputs
 0< [] 'DeDupNames:Link_33.v'
 ## Outputs
-0> [] 'Transformer_43:DSLink44.v'
+0> [] 'Tfm_CreateCol:DSLink44.v'
 ## Outputs
-1> [] 'Transformer_43:DSLink46.v'
+1> [] 'Tfm_CreateCol:DSLink46.v'
 ;
 #################################################################
 #### STAGE: AggByState
@@ -58,7 +58,7 @@ group
 ## General options
 [ident('AggByState'); jobmon_ident('AggByState')]
 ## Inputs
-0< [] 'Transformer_43:DSLink44.v'
+0< [] 'Tfm_CreateCol:DSLink44.v'
 ## Outputs
 0> [modify (
 keep
@@ -75,7 +75,7 @@ group
 ## General options
 [ident('AggCountRows'); jobmon_ident('AggCountRows')]
 ## Inputs
-0< [] 'Transformer_43:DSLink46.v'
+0< [] 'Tfm_CreateCol:DSLink46.v'
 ## Outputs
 0> [modify (
 keep
