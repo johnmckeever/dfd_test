@@ -1,0 +1,150 @@
+# OSH / orchestrate script for Job S3_Read_Company_New compiled at 11:39:35 08 NOV 2018
+#
+# OSH / orchestrate script for Job S3_Read_Company_New compiled at 11:39:35 08 Nov 2018
+#################################################################
+#### STAGE: S3_Src_Company
+## Operator
+pxbridge
+## Operator options
+-Orientation stage
+-XMLProperties '<?xml version=\'1.0\' encoding=\'UTF-16\'?><Properties version=\'1.1\'><Common><Context type=\'int\'>1</Context><Variant type=\'string\'>1.0</Variant><DescriptorVersion type=\'string\'>1.0</DescriptorVersion><PartitionType type=\'int\'>-1</PartitionType><RCP type=\'int\'>0</RCP></Common><Connection><Region modified=\'0\' type=\'string\'><![CDATA[]]></Region><UseCredentialsFile type=\'bool\'><![CDATA[0]]></UseCredentialsFile><AccessKey modified=\'0\' type=\'string\'><![CDATA[[&"pS3_ACCESS_KEY"]]]></AccessKey><SecretKey modified=\'0\' type=\'protectedstring\'><![CDATA[{iisenc}gYeU14Jg0CdLr0kYhVizTChT9yck4yZnxkEfowyznUKw60g8xqcmqVCT4hDAmuCS]]></SecretKey></Connection><Usage><IsReject type=\'bool\'><![CDATA[0]]></IsReject><ReadMode type=\'int\'><![CDATA[0]]></ReadMode><BucketSource type=\'string\'><![CDATA[[&"pS3_BKT_NAME"]]]></BucketSource><FilenameSource type=\'string\'><![CDATA[COMPANY_201811.csv]]></FilenameSource><RejectMode type=\'int\'><![CDATA[0]]></RejectMode><FilenameColumn type=\'string\'><![CDATA[]]></FilenameColumn><FileFormat type=\'int\'><![CDATA[0]]><DelimitedSyntax><RecordLimit modified=\'1\' type=\'int\'><![CDATA[[&"pNO_RECS"]]]></RecordLimit><Encoding type=\'string\'><![CDATA[]]></Encoding><RecordDef type=\'int\'><![CDATA[0]]></RecordDef><Header modified=\'1\' type=\'bool\'><![CDATA[1]]></Header><DataFormat type=\'int\'><![CDATA[0]]></DataFormat><FieldDelimiter modified=\'1\' type=\'string\'><![CDATA[|]]></FieldDelimiter><RowDelimiter type=\'string\'><![CDATA[<NL>]]></RowDelimiter><Quotes type=\'int\'><![CDATA[0]]></Quotes><Escape type=\'string\'><![CDATA[]]></Escape><TraceFile type=\'string\'><![CDATA[]]></TraceFile><NullValue type=\'string\'><![CDATA[]]></NullValue><FieldFormats><DecimalFormat type=\'string\'><![CDATA[]]></DecimalFormat><DateFormat type=\'string\'><![CDATA[]]></DateFormat><TimeFormat type=\'string\'><![CDATA[]]></TimeFormat><TimestampFormat type=\'string\'><![CDATA[]]></TimestampFormat></FieldFormats></DelimitedSyntax></FileFormat><Java><HeapSize type=\'int\'><![CDATA[128]]></HeapSize><ConnectorClasspath type=\'string\'><![CDATA[$(DSHOME)/../DSComponents/bin/ccjava-api.jar;$(DSHOME)/../DSComponents/bin/ccjava.jar;$(DSHOME)/../DSComponents/bin/ccs3.jar;$(DSHOME)/../DSComponents/bin/JISDocHandler.jar;$(DSHOME)]]></ConnectorClasspath><ConnectorOtherOptions type=\'string\'><![CDATA[-Dcom.ibm.tools.attach.enable=no -Dcom.ibm.is.cc.options=noisfjars ]]></ConnectorOtherOptions></Java><UserClassName type=\'string\'><![CDATA[com.ibm.iis.cc.s3.AmazonS3Stage]]></UserClassName><UserDefinedFunction type=\'bool\'><![CDATA[0]]></UserDefinedFunction></Usage></Properties >'
+-connector '{
+variant=\'1.0\',
+library="java:com/ibm/iis/cc/s3/connector/AmazonS3ConnectorLibrary",
+version=1.0,
+variantlist=\'V1;1.0::"java:com/ibm/iis/cc/s3/connector/AmazonS3ConnectorLibrary"\',
+versionlist=\'1.0\',
+name=AmazonS3
+}'
+-linkXMLProperties source 0  '<?xml version=\'1.0\' encoding=\'UTF-16\'?><Properties version=\'1.1\'><Common><Context type=\'int\'>1</Context><Variant type=\'string\'>1.0</Variant><Reject></Reject><DescriptorVersion type=\'string\'>1.0</DescriptorVersion><PartitionType type=\'int\'>-1</PartitionType><RCP type=\'int\'>0</RCP></Common><Usage><IsReject type=\'bool\'><![CDATA[0]]></IsReject><IsRejectLink type=\'bool\'><![CDATA[0]]></IsRejectLink></Usage></Properties >'
+-source 0 '{
+		DSSQLType={CompanyName=12, ACN=12, Type=12, Class=12, SubClass=12, Status=12, DateOfReg=12, PrevStateOfReg=12, StateRegNum=12, Modified=12, Current=12, ABN=12, CurrentName=12, CurrentNameStartDate=12},
+		DSSQLPrecision={CompanyName=255, ACN=100, Type=100, Class=100, SubClass=100, Status=100, DateOfReg=50, PrevStateOfReg=100, StateRegNum=100, Modified=100, Current=100, ABN=100, CurrentName=100, CurrentNameStartDate=50},
+		DSSchema=\'record
+			(
+			  CompanyName\:nullable ustring\[max\=255\]\;
+			  ACN\:nullable ustring\[max\=100\]\;
+			  Type\:nullable ustring\[max\=100\]\;
+			  Class\:nullable ustring\[max\=100\]\;
+			  SubClass\:nullable ustring\[max\=100\]\;
+			  Status\:nullable ustring\[max\=100\]\;
+			  DateOfReg\:nullable ustring\[max\=50\]\;
+			  PrevStateOfReg\:nullable ustring\[max\=100\]\;
+			  StateRegNum\:nullable ustring\[max\=100\]\;
+			  Modified\:nullable ustring\[max\=100\]\;
+			  Current\:nullable ustring\[max\=100\]\;
+			  ABN\:nullable ustring\[max\=100\]\;
+			  CurrentName\:nullable ustring\[max\=100\]\;
+			  CurrentNameStartDate\:nullable ustring\[max\=50\]\;
+			)\'
+}'
+## General options
+[ident('S3_Src_Company'); jobmon_ident('S3_Src_Company')]
+## Outputs
+0> [modify (
+  CompanyName:nullable ustring[max=255]=CompanyName;
+  ACN:nullable ustring[max=100]=ACN;
+  Type:nullable ustring[max=100]=Type;
+  Class:nullable ustring[max=100]=Class;
+  SubClass:nullable ustring[max=100]=SubClass;
+  Status:nullable ustring[max=100]=Status;
+  DateOfReg:nullable ustring[max=50]=DateOfReg;
+  PrevStateOfReg:nullable ustring[max=100]=PrevStateOfReg;
+  StateRegNum:nullable ustring[max=100]=StateRegNum;
+  Modified:nullable ustring[max=100]=Modified;
+  Current:nullable ustring[max=100]=Current;
+  ABN:nullable ustring[max=100]=ABN;
+  CurrentName:nullable ustring[max=100]=CurrentName;
+  CurrentNameStartDate:nullable ustring[max=50]=CurrentNameStartDate;
+keep
+   CompanyName, ACN, Type, Class, 
+   SubClass, Status, DateOfReg, PrevStateOfReg, 
+   StateRegNum, Modified, Current, ABN, 
+   CurrentName, CurrentNameStartDate;
+)] 'S3_Src_Company:Link_3.v'
+;
+#################################################################
+#### STAGE: Copy_1
+## Operator
+copy
+## Operator options
+## General options
+[ident('Copy_1'); jobmon_ident('Copy_1')]
+## Inputs
+0< [] 'S3_Src_Company:Link_3.v'
+## Outputs
+0> [modify (
+keep
+CompanyName,ACN,Type,Class,
+SubClass,Status,DateOfReg,PrevStateOfReg,
+StateRegNum,Modified,Current,ABN,
+CurrentName,CurrentNameStartDate;)] 'Copy_1:Link_23.v'
+;
+#################################################################
+#### STAGE: SortByName
+## Operator
+tsort
+## Operator options
+-stable
+-key 'CompanyName'
+-asc
+## General options
+[ident('SortByName'); jobmon_ident('SortByName')]
+## Inputs
+0< [] 'Copy_1:Link_23.v'
+## Outputs
+0> [modify (
+keep
+CompanyName,ACN,Type,Class,
+SubClass,Status,DateOfReg,PrevStateOfReg,
+StateRegNum,Modified,Current,ABN,
+CurrentName,CurrentNameStartDate;)] 'SortByName:Link_24.v'
+;
+#################################################################
+#### STAGE: RemDupNames
+## Operator
+remdup
+## Operator options
+-keep first
+-key 'CompanyName'
+## General options
+[ident('RemDupNames'); jobmon_ident('RemDupNames')]
+## Inputs
+0< [] 'SortByName:Link_24.v'
+## Outputs
+0> [modify (
+keep
+CompanyName,ACN,Type,Class,
+SubClass,Status,DateOfReg,PrevStateOfReg,
+StateRegNum,Modified,Current,ABN,
+CurrentName,CurrentNameStartDate;)] 'RemDupNames:Link_31.v'
+;
+#################################################################
+#### STAGE: Copy_3
+## Operator
+copy
+## Operator options
+## General options
+[ident('Copy_3'); jobmon_ident('Copy_3')]
+## Inputs
+0< [] 'RemDupNames:Link_31.v'
+## Outputs
+0> [modify (
+keep
+CompanyName,ACN,Type,Class,
+SubClass,Status,DateOfReg,PrevStateOfReg,
+StateRegNum,Modified,Current,ABN,
+CurrentName,CurrentNameStartDate;)] 'Copy_3:Link_33.v'
+;
+###############################################################
+#### STAGE: DeDupNames
+## Operator
+copy
+## General options
+[ident('DeDupNames')]
+## Inputs
+0< [] 'Copy_3:Link_33.v'
+## Outputs
+0>| [ds]'/tmp/dedeup_names.ds'
+;
+# End of OSH code
